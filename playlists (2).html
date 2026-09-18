@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playlists — 6 años de historial</title>
+<style>
+  :root{
+    --bg:#141116;
+    --bg-alt:#1b1720;
+    --card:#201b26;
+    --line:rgba(255,255,255,0.08);
+    --text:#efe9e2;
+    --text-dim:#a99fb0;
+    --accent-1:#e0562e;
+    --accent-2:#7fa889;
+    --accent-3:#c9a15a;
+  }
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+  }
+  :root[data-theme="light"]{
+    --bg:#f5f1ea;
+    --bg-alt:#efe9df;
+    --card:#ffffff;
+    --line:rgba(30,20,10,0.12);
+    --text:#211a17;
+    --text-dim:#6b5f5a;
+    --accent-1:#c8451f;
+    --accent-2:#3d6b4d;
+    --accent-3:#9c7a2e;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f5f1ea;
+      --bg-alt:#efe9df;
+      --card:#ffffff;
+      --line:rgba(30,20,10,0.12);
+      --text:#211a17;
+      --text-dim:#6b5f5a;
+      --accent-1:#c8451f;
+      --accent-2:#3d6b4d;
+      --accent-3:#9c7a2e;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--text); }
+  body{
+    font-family: 'Iowan Old Style','Georgia','Times New Roman',serif;
+    line-height:1.5;
+    padding: 0 0 6rem 0;
+  }
+
+  .wrap{ max-width: 880px; margin:0 auto; padding: 0 1.5rem; }
+
+  header.hero{
+    padding: 4.5rem 0 3rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .kicker{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: var(--text-dim);
+    margin: 0 0 1rem 0;
+  }
+  h1{
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+    line-height: 1.05;
+    margin: 0 0 1rem 0;
+    font-weight: 500;
+    max-width: 14ch;
+  }
+  .lede{
+    font-size: 1.05rem;
+    color: var(--text-dim);
+    max-width: 62ch;
+    margin: 0 0 2rem 0;
+  }
+  .stats{
+    display:flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .stat .n{
+    font-size: 1.7rem;
+    color: var(--accent-1);
+    font-weight: 600;
+    display:block;
+    line-height:1.1;
+  }
+  .stat .l{
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+
+  nav.toc{
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--line);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  nav.toc ol{
+    list-style:none;
+    margin:0; padding:0;
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+    gap: 0.5rem 1.5rem;
+  }
+  nav.toc a{
+    color: var(--text);
+    text-decoration:none;
+    font-size:0.92rem;
+    border-bottom: 1px solid transparent;
+    display:flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+  }
+  nav.toc a:hover{ border-bottom-color: var(--accent-1); }
+  nav.toc a span.count{ color: var(--text-dim); font-size:0.82rem; }
+
+  section.playlist{
+    padding: 3.2rem 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 1.5rem;
+  }
+  .pl-head{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+  }
+  .pl-head h2{
+    font-size: 1.65rem;
+    margin:0;
+    font-weight: 500;
+  }
+  .pl-meta{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .pl-desc{
+    color: var(--text-dim);
+    max-width: 68ch;
+    margin: 0 0 1.6rem 0;
+    font-size: 0.98rem;
+  }
+
+  .artist-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 0.9rem;
+  }
+  .artist-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+  }
+  .artist-card .name{
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.15rem 0;
+  }
+  .artist-card .hours{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-1);
+    margin: 0 0 0.5rem 0;
+  }
+  .artist-card .tracks{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin:0;
+    line-height: 1.55;
+  }
+
+  footer{
+    padding: 3rem 0 1rem 0;
+    color: var(--text-dim);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82rem;
+  }
+
+  ::selection{ background: var(--accent-1); color: #fff; }
+
+  .tabs{
+    display:flex;
+    gap: 0.5rem;
+    padding: 1.5rem 0 0 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .tab-btn{
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .tab-btn:hover{ color: var(--text); border-color: var(--accent-1); }
+  .tab-btn.active{
+    background: var(--accent-1);
+    color: #fff;
+    border-color: var(--accent-1);
+  }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; }
+
+  .spotify-profile-link{
+    display:inline-flex;
+    align-items:center;
+    gap: 0.5rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.88rem;
+    color: var(--accent-2);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin: 2rem 0 1rem 0;
+  }
+  .spotify-profile-link:hover{ border-color: var(--accent-2); }
+
+  .pl-list-section{
+    padding: 2.2rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .pl-list-section h2{
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin: 0 0 1rem 0;
+  }
+  .embed-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.2rem;
+  }
+  .embed-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .embed-card p.pname{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.7rem 0;
+  }
+  .embed-card iframe{
+    border-radius: 8px;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">112.782 reproducciones · 2022–2026</p>
+    <h1>Una presentación de tu gusto musical de estos últimos 3 años</h1>
+    <p class="lede">
+      A partir de tu historial extendido de Spotify (streams + tus playlists guardadas)
+      armé 13 playlists con tus 350 artistas más escuchados, priorizando
+      lo más rotado últimamente por sobre lo viejo de 2023. Cada una lista los artistas
+      que la componen, cuánto tiempo les diste y sus temas más repetidos —
+      llevátelo a Spotify y armá la lista buscando esos nombres.
+    </p>
+    <div class="stats">
+      <div class="stat"><span class="n">350</span><span class="l">artistas incluidos</span></div>
+      <div class="stat"><span class="n">13</span><span class="l">playlists armadas</span></div>
+      <div class="stat"><span class="n">~2715h</span><span class="l">escuchadas (top artistas)</span></div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="analisis">Análisis</button>
+    <button class="tab-btn" data-tab="playlists">Playlists</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-analisis">
+
+  <nav class="toc">
+    <ol>
+      <li><a href="#rock-nacional"><span>Rock nacional, de raíz</span><span class="count">34</span></a></li>
+      <li><a href="#urbano-under"><span>Urbano under / plugg argentino</span><span class="count">32</span></a></li>
+      <li><a href="#reggaeton"><span>Reggaetón y trap latino</span><span class="count">22</span></a></li>
+      <li><a href="#hiphop"><span>Hip hop y rap USA</span><span class="count">29</span></a></li>
+      <li><a href="#soul-funk"><span>Soul, funk y yacht rock</span><span class="count">42</span></a></li>
+      <li><a href="#new-wave"><span>New wave y synth-pop 80s</span><span class="count">31</span></a></li>
+      <li><a href="#indie-alt"><span>Indie y rock alternativo</span><span class="count">29</span></a></li>
+      <li><a href="#metal"><span>Metal y hard rock</span><span class="count">36</span></a></li>
+      <li><a href="#classic-rock"><span>Classic rock 70s</span><span class="count">27</span></a></li>
+      <li><a href="#tropical"><span>Tropical y salsa</span><span class="count">13</span></a></li>
+      <li><a href="#yacht-citypop"><span>City pop, anime y bandas sonoras</span><span class="count">16</span></a></li>
+      <li><a href="#latino-alt"><span>Latino alternativo</span><span class="count">16</span></a></li>
+      <li><a href="#mixtape-under"><span>Mixtape lo-fi / bedroom</span><span class="count">30</span></a></li>
+    </ol>
+  </nav>
+
+  <section class="playlist" id="rock-nacional">
+    <div class="pl-head">
+      <h2>Rock nacional, de raíz</h2>
+      <span class="pl-meta">34 artistas · ~480h</span>
+    </div>
+    <p class="pl-desc">El núcleo más escuchado de todo tu historial: Soda Stereo y Cerati a la cabeza, pasando por Redondos, el rock chabón de los 2000 y las raíces del género en los 70/80.</p>
+    <div class="artist-grid" id="grid-rock-nacional"></div>
+  </section>
+  <section class="playlist" id="urbano-under">
+    <div class="pl-head">
+      <h2>Urbano under / plugg argentino</h2>
+      <span class="pl-meta">32 artistas · ~446h</span>
+    </div>
+    <p class="pl-desc">La escena under que más rotó en tu cuenta: YSY A y Zuhk como buques insignia, y una constelación de artistas de trap, plugg y R&amp;B lo-fi en español.</p>
+    <div class="artist-grid" id="grid-urbano-under"></div>
+  </section>
+  <section class="playlist" id="reggaeton">
+    <div class="pl-head">
+      <h2>Reggaetón y trap latino</h2>
+      <span class="pl-meta">22 artistas · ~192h</span>
+    </div>
+    <p class="pl-desc">Bad Bunny domina, con Feid, Rauw Alejandro y los clásicos del reggaetón puertorriqueño de los 2000 (Wisin &amp; Yandel, Don Omar) mechados con dembow dominicano.</p>
+    <div class="artist-grid" id="grid-reggaeton"></div>
+  </section>
+  <section class="playlist" id="hiphop">
+    <div class="pl-head">
+      <h2>Hip hop y rap USA</h2>
+      <span class="pl-meta">29 artistas · ~304h</span>
+    </div>
+    <p class="pl-desc">Desde clásicos de los 90 (2Pac, Biggie, Ice Cube) hasta el rage/trap actual (Travis Scott, Playboi Carti, Ken Carson), pasando por Kendrick y Eminem en el medio.</p>
+    <div class="artist-grid" id="grid-hiphop"></div>
+  </section>
+  <section class="playlist" id="soul-funk">
+    <div class="pl-head">
+      <h2>Soul, funk y yacht rock</h2>
+      <span class="pl-meta">42 artistas · ~283h</span>
+    </div>
+    <p class="pl-desc">Sade y Jamiroquai lideran una veta suave: soul ochentoso, funk, crooners y yacht rock — la música más 'para atardecer' de tu historial.</p>
+    <div class="artist-grid" id="grid-soul-funk"></div>
+  </section>
+  <section class="playlist" id="new-wave">
+    <div class="pl-head">
+      <h2>New wave y synth-pop 80s</h2>
+      <span class="pl-meta">31 artistas · ~180h</span>
+    </div>
+    <p class="pl-desc">Billy Idol, The Smiths, The Police y The Cure — la new wave y el synth-pop británico/USA de los 80 que aparece de forma constante en tus años de escucha.</p>
+    <div class="artist-grid" id="grid-new-wave"></div>
+  </section>
+  <section class="playlist" id="indie-alt">
+    <div class="pl-head">
+      <h2>Indie y rock alternativo</h2>
+      <span class="pl-meta">29 artistas · ~217h</span>
+    </div>
+    <p class="pl-desc">Arctic Monkeys y Tame Impala a la cabeza de una veta indie/alternativa que atraviesa Britpop, garage revival de los 2000 y bedroom pop actual.</p>
+    <div class="artist-grid" id="grid-indie-alt"></div>
+  </section>
+  <section class="playlist" id="metal">
+    <div class="pl-head">
+      <h2>Metal y hard rock</h2>
+      <span class="pl-meta">36 artistas · ~176h</span>
+    </div>
+    <p class="pl-desc">Metallica, AC/DC y Deftones como puntas de lanza de una veta más pesada, con metal nacional (Rata Blanca) y nu-metal/grunge de los 90-2000 sumados.</p>
+    <div class="artist-grid" id="grid-metal"></div>
+  </section>
+  <section class="playlist" id="classic-rock">
+    <div class="pl-head">
+      <h2>Classic rock 70s</h2>
+      <span class="pl-meta">27 artistas · ~98h</span>
+    </div>
+    <p class="pl-desc">Led Zeppelin, Pink Floyd, The Beatles y compañía: el rock clásico de los 70 que sigue rotando fuerte, con algo de yacht/soft rock de esa época mezclado.</p>
+    <div class="artist-grid" id="grid-classic-rock"></div>
+  </section>
+  <section class="playlist" id="tropical">
+    <div class="pl-head">
+      <h2>Tropical y salsa</h2>
+      <span class="pl-meta">13 artistas · ~52h</span>
+    </div>
+    <p class="pl-desc">Salsa, bachata y dembow caribeño: de la salsa clásica de Willie Colón y Héctor Lavoe a la bachata romántica de Aventura y Romeo Santos.</p>
+    <div class="artist-grid" id="grid-tropical"></div>
+  </section>
+  <section class="playlist" id="yacht-citypop">
+    <div class="pl-head">
+      <h2>City pop, anime y bandas sonoras</h2>
+      <span class="pl-meta">16 artistas · ~102h</span>
+    </div>
+    <p class="pl-desc">City pop japonés (平田志穂子, Anri, Tomoko Aran ya están en soul-funk) mezclado acá con bandas sonoras de videojuegos y anime: Jeremy Soule, 梶浦由記, OxT.</p>
+    <div class="artist-grid" id="grid-yacht-citypop"></div>
+  </section>
+  <section class="playlist" id="latino-alt">
+    <div class="pl-head">
+      <h2>Latino alternativo</h2>
+      <span class="pl-meta">16 artistas · ~80h</span>
+    </div>
+    <p class="pl-desc">Kevin Kaarl, Mon Laferte y una veta de indie/alt en español que va de México a Chile, con algo de rock uruguayo (Miranda!, Los Prisioneros) sumado.</p>
+    <div class="artist-grid" id="grid-latino-alt"></div>
+  </section>
+  <section class="playlist" id="mixtape-under">
+    <div class="pl-head">
+      <h2>Mixtape lo-fi / bedroom</h2>
+      <span class="pl-meta">30 artistas · ~105h</span>
+    </div>
+    <p class="pl-desc">Una bolsa más ecléctica de productores y artistas under, lo-fi y bedroom que aparecen de forma recurrente pero dispersa en tu historial.</p>
+    <div class="artist-grid" id="grid-mixtape-under"></div>
+  </section>
+
+  <footer>
+    Armado a partir de tu Extended Streaming History de Spotify (2022–2026) y tus playlists guardadas.
+    Las horas son estimadas sobre reproducciones de 30s o más. El orden dentro de cada playlist prioriza
+    escucha reciente sobre escucha vieja.
+  </footer>
+
+  </div>
+
+  <div class="tab-panel" id="tab-playlists">
+
+  <a class="spotify-profile-link" href="https://open.spotify.com/user/312i7s4wllcljt3zjzmzqf3g7jlm" target="_blank" rel="noopener">
+    ↗ Ver tu perfil de Spotify
+  </a>
+
+  <section class="pl-list-section">
+    <h2>Tus playlists</h2>
+    <p class="pl-desc">Tus playlists guardadas. Las que tienen reproductor embebido las podés escuchar acá mismo; a las últimas tres todavía les falta el link.</p>
+    <div class="embed-grid" id="playlist-embeds"></div>
+  </section>
+
+  </div>
+</div>
+
+<script>
+const data = {"Soda Stereo": {"hours": 84.7, "plays": 1261, "top_tracks": ["Cuando Pase El Temblor - Remasterizado 2007", "Lo Que Sangra (La Cúpula) - Remasterizado 2007", "Trátame Suavemente - Remasterizado 2007", "Te Para 3 - MTV Unplugged", "Nada Personal - Remasterizado 2007"]}, "Sade": {"hours": 51.0, "plays": 711, "top_tracks": ["Is It a Crime", "Smooth Operator", "Like a Tattoo", "I Will Be Your Friend", "The Sweetest Taboo"]}, "Jamiroquai": {"hours": 34.3, "plays": 473, "top_tracks": ["Falling", "Space Cowboy", "Alright - Remastered 2013", "Canned Heat", "Little L"]}, "Gustavo Cerati": {"hours": 63.8, "plays": 1012, "top_tracks": ["Vivo", "Bocanada", "Amor Amarillo", "Puente", "Lago en el Cielo"]}, "Patricio Rey y sus Redonditos de Ricota": {"hours": 71.9, "plays": 1111, "top_tracks": ["Salando las Heridas", "Semen-Up", "Canción para Naufragios", "Motor Psico", "Preso en Mi Ciudad"]}, "Thee Sacred Souls": {"hours": 26.6, "plays": 495, "top_tracks": ["Weak for Your Love", "Can I Call You Rose?", "Will I See You Again?", "For Now", "Future Lover"]}, "YSY A": {"hours": 63.6, "plays": 1427, "top_tracks": ["CON EL TIEMPO", "El Amanecer", "DE REPENTE", "TANTO DESORDEN", "TUUUYO"]}, "The Smiths": {"hours": 19.7, "plays": 343, "top_tracks": ["This Night Has Opened My Eyes - 2011 Remaster", "How Soon Is Now? - 2011 Remaster", "This Charming Man - 2011 Remaster", "Asleep - 2011 Remaster", "Heaven Knows I'm Miserable Now - 2011 Remaster"]}, "Michael Jackson": {"hours": 25.4, "plays": 387, "top_tracks": ["Baby Be Mine", "Love Never Felt So Good", "Remember the Time", "Rock with You - Single Version", "Billie Jean"]}, "Indio Solari": {"hours": 39.8, "plays": 600, "top_tracks": ["Y Mientras Tanto el Sol Se Muere...", "El Charro Chino", "Pabellón Séptimo (Relato de Horacio)", "Ramas Desnudas", "Pedía Siempre Temas en la Radio..."]}, "Bad Bunny": {"hours": 40.0, "plays": 706, "top_tracks": ["NUEVAYoL", "MONACO", "BAILE INoLVIDABLE", "VeLDÁ", "VOY A LLeVARTE PA PR"]}, "平田志穂子": {"hours": 11.8, "plays": 275, "top_tracks": ["Heartbeat, Heartbreak", "Heaven", "Signs Of Love", "Your Affection", "Pursuing My True Self"]}, "Lyn": {"hours": 11.1, "plays": 161, "top_tracks": ["Beneath the Mask", "No More What Ifs", "Wake Up, Get Up, Get Out There", "Last Surprise", "Beneath the Mask -rain-"]}, "Zuhk": {"hours": 34.4, "plays": 819, "top_tracks": ["Tú eres mía", "Somos nada", "Camara lenta", "Otro día solo", "Amiri"]}, "Tame Impala": {"hours": 22.8, "plays": 364, "top_tracks": ["Borderline", "The Boat I Row", "One More Hour", "New Person, Same Old Mistakes", "The Less I Know The Better"]}, "Billy Idol": {"hours": 18.3, "plays": 243, "top_tracks": ["Rebel Yell", "Flesh For Fantasy", "Eyes Without A Face", "Flesh for Fantasy - Live in Dallas", "White Wedding - Pt. 1"]}, "Jeremy Soule": {"hours": 33.1, "plays": 584, "top_tracks": ["Far Horizons", "Skyrim Atmospheres", "Dragonborn", "One They Fear", "Unbroken Road"]}, "The Weeknd": {"hours": 37.1, "plays": 645, "top_tracks": ["Die For You", "Call Out My Name", "I Feel It Coming", "Starboy", "Popular (with Playboi Carti & Madonna) - From The Idol Vol. 1 (Music from the HBO Original Series)"]}, "Deftones": {"hours": 14.0, "plays": 200, "top_tracks": ["Be Quiet and Drive (Far Away)", "Sextape", "Rosemary", "Change (In the House of Flies)", "My Own Summer (Shove It)"]}, "Daryl Hall & John Oates": {"hours": 15.7, "plays": 233, "top_tracks": ["Adult Education", "Out of Touch", "I Can't Go for That (No Can Do)", "Maneater", "Sara Smile"]}, "Dazegxd": {"hours": 20.1, "plays": 373, "top_tracks": ["i could take u there", "4ever (no data)", "emotion engine", "sendin' my luv", "love roulette"]}, "Travis Scott": {"hours": 34.4, "plays": 632, "top_tracks": ["FE!N (feat. Playboi Carti)", "TIL FURTHER NOTICE (feat. James Blake & 21 Savage)", "MELTDOWN (feat. Drake)", "I KNOW ?", "sdp interlude"]}, "Rayder": {"hours": 27.0, "plays": 804, "top_tracks": ["Bb Simon", "Ojos Rojos Vino Tinto", "Kpoper", "Plug N Venas", "Blanquita Pelo Castaño"]}, "The Cure": {"hours": 10.3, "plays": 166, "top_tracks": ["Lovesong - Remastered", "A Night Like This", "The Last Day Of Summer", "Lullaby - Remastered", "A Forest"]}, "Virus": {"hours": 18.9, "plays": 299, "top_tracks": ["Pronta Entrega", "Sin Disfraz", "Amor Descartable", "Luna de Miel en la Mano", "Mirada Speed"]}, "Andrés Calamaro": {"hours": 23.3, "plays": 396, "top_tracks": ["Loco", "Flaca", "Cartas Sin Marcar", "La parte de adelante", "Alta suciedad"]}, "AC/DC": {"hours": 13.1, "plays": 175, "top_tracks": ["Hells Bells - Live at River Plate Stadium, Buenos Aires, Argentina - December 2009", "Back In Black", "Shoot to Thrill", "Thunderstruck - Live at River Plate Stadium, Buenos Aires, Argentina - December 2009", "You Shook Me All Night Long"]}, "Kendrick Lamar": {"hours": 18.6, "plays": 268, "top_tracks": ["FEAR.", "PRIDE.", "Alright", "Not Like Us", "Money Trees"]}, "Makoto Matsushita": {"hours": 10.2, "plays": 130, "top_tracks": ["Love Was Really Gone - 2018 Remaster", "September Rain - 2020 Remaster", "First Light - 2018 Remaster", "September Rain - 2018 Remaster", "One Hot Love - 2018 Remaster"]}, "Babasonicos": {"hours": 16.3, "plays": 341, "top_tracks": ["Como Eran Las Cosas", "El Colmo", "Irresponsables", "Putita", "Y qué"]}, "The Strokes": {"hours": 10.1, "plays": 178, "top_tracks": ["Call It Fate, Call It Karma", "Why Are Sundays So Depressing", "The Adults Are Talking", "Welcome To Japan", "Selfless"]}, "TOTO": {"hours": 10.2, "plays": 155, "top_tracks": ["Georgy Porgy", "Africa", "Hold the Line", "Hold the Line - Live", "Rosanna"]}, "Black Sabbath": {"hours": 9.5, "plays": 124, "top_tracks": ["Heaven and Hell", "Snowblind - 2009 Remaster", "Paranoid - 2009 Remaster", "War Pigs - 2009 Remaster", "Into the Void - 2009 Remaster"]}, "The Police": {"hours": 10.1, "plays": 158, "top_tracks": ["Roxanne", "Wrapped Around Your Finger - Remastered 2003", "Can't Stand Losing You", "Wrapped Around Your Finger - Live From River Plate Stadium, Buenos Aires", "Message In A Bottle"]}, "Metallica": {"hours": 13.4, "plays": 177, "top_tracks": ["Enter Sandman - Remastered 2021", "Seek & Destroy - Remastered", "Nothing Else Matters - Remastered 2021", "For Whom The Bell Tolls - Remastered", "Fuel"]}, "Henezy": {"hours": 22.7, "plays": 563, "top_tracks": ["Invierno", "luv", "77", "Invierno, Pt. 2", "Camara Lenta"]}, "Mac DeMarco": {"hours": 24.9, "plays": 492, "top_tracks": ["Heart To Heart", "Freaking Out the Neighborhood", "Chamber Of Reflection", "No Other Heart", "For the First Time"]}, "Radiohead": {"hours": 10.5, "plays": 173, "top_tracks": ["Man of War", "Creep", "Jigsaw Falling Into Place", "Exit Music (For A Film)", "Weird Fishes / Arpeggi"]}, "Los Enanitos Verdes": {"hours": 17.9, "plays": 310, "top_tracks": ["La Muralla Verde", "Amores Lejanos", "Igual Que Ayer", "Lamento Boliviano", "Tu Carcel - En Vivo"]}, "Wisin & Yandel": {"hours": 11.5, "plays": 214, "top_tracks": ["Porque Me Tratas Así?", "Me Estas Tentando", "Abusadora", "Sexy Movimiento", "Mayor Que Yo"]}, "MECHAYRXMEO": {"hours": 21.7, "plays": 448, "top_tracks": ["Toronto", "MOTORSPORT", "Player", "ASTON MARTIN & CARTIER", "Gucci Flip Flops"]}, "TOOL": {"hours": 9.3, "plays": 108, "top_tracks": ["Ænema", "Forty Six & 2", "H.", "Schism", "The Pot"]}, "Don Toliver": {"hours": 16.4, "plays": 333, "top_tracks": ["No Pole", "Private Landing (feat. Justin Bieber & Future)", "You (feat. Travis Scott)", "BANDIT", "No Idea"]}, "Alice In Chains": {"hours": 8.9, "plays": 138, "top_tracks": ["Bleed The Freak", "Man in the Box", "Would? (2022 Remaster)", "It Ain't Like That", "Stone"]}, "Arctic Monkeys": {"hours": 28.7, "plays": 510, "top_tracks": ["505", "Fluorescent Adolescent", "Teddy Picker", "Do I Wanna Know?", "Why'd You Only Call Me When You're High?"]}, "Three Days Grace": {"hours": 9.1, "plays": 157, "top_tracks": ["I Hate Everything About You", "Animal I Have Become", "Home", "Never Too Late", "Riot"]}, "梶浦 由記": {"hours": 10.0, "plays": 173, "top_tracks": ["Fuscus the Vacant Colossus", "the destiny waltz", "together we can defeat it!", "inverse operation", "Is this love?"]}, "Journey": {"hours": 10.3, "plays": 152, "top_tracks": ["Who's Crying Now (2022 Remaster)", "Separate Ways (Worlds Apart) [2023 Remaster]", "Don't Stop Believin' (2022 Remaster)", "You Got The Best Of Me", "Don't Stop Believin' (Live at The Summit, Houston, Texas, November 6, 1981 - 2022 Remaster)"]}, "The Beatles": {"hours": 13.2, "plays": 242, "top_tracks": ["Now And Then", "While My Guitar Gently Weeps - Remastered 2009", "And I Love Her - Remastered 2009", "Something - Remastered 2009", "In My Life - Remastered 2009"]}, "アトラスサウンドチーム": {"hours": 5.9, "plays": 159, "top_tracks": ["Ideal and the Real", "Have a Short Rest", "When Mother Was There", "記憶の片隅", "Meeting"]}, "Mikeanyway": {"hours": 18.4, "plays": 398, "top_tracks": ["AYER - Plugg conciencia", "BLANCO", "NOS SOLTAMOS", "DE LA GEEZY", "GUXXI"]}, "Foreigner": {"hours": 8.0, "plays": 127, "top_tracks": ["Girl on the Moon", "Waiting for a Girl like You", "I Want to Know What Love Is - 1999 Remaster", "I Want to Know What Love Is - Live at Swr1", "Urgent"]}, "Milo j": {"hours": 19.5, "plays": 511, "top_tracks": ["Tus Vueltas", "OLIMPO", "ANTES DE LOS 20", "Milagrosa", "3 PECADOS DESPUES…"]}, "Gorillaz": {"hours": 12.7, "plays": 223, "top_tracks": ["Dirty Harry (feat. Bootie Brown)", "DARE", "Feel Good Inc.", "Clint Eastwood", "DARE (feat. Shaun Ryder & Roses Gabor)"]}, "Tempesst": {"hours": 5.8, "plays": 96, "top_tracks": ["Must Be a Dream", "Stranger to You Now", "With a Woman", "Voices in My Head", "Prisoner of Desire"]}, "Linkin Park": {"hours": 8.7, "plays": 182, "top_tracks": ["Somewhere I Belong", "Faint", "One Step Closer", "Lying from You", "Given Up"]}, "2Pac": {"hours": 15.2, "plays": 225, "top_tracks": ["All Eyez On Me (ft. Big Syke)", "Do For Love", "Ratha Be Ya Nigga (ft. Richie Rich)", "California Love - Original Version", "Ambitionz Az A Ridah"]}, "Player": {"hours": 8.0, "plays": 125, "top_tracks": ["Baby Come Back", "Givin' It All", "Who Do You Think You Are?", "Melanie", "It's For You"]}, "Anri": {"hours": 6.6, "plays": 110, "top_tracks": ["SHYNESS BOY", "Last Summer Whisper", "WINDY SUMMER", "Remember Summer Days", "Good Bye Boogie Dance"]}, "Bobby Caldwell": {"hours": 6.5, "plays": 97, "top_tracks": ["What You Won't Do for Love", "My Flame", "Coming Down from Love", "Carry On", "You Belong To Me"]}, "Duran Duran": {"hours": 7.2, "plays": 97, "top_tracks": ["Ordinary World", "Save a Prayer - 2009 Remaster", "Come Undone", "Come Undone - Live At The MEN Arena, Manchester, England / 2011", "INVISIBLE"]}, "Charly García": {"hours": 12.2, "plays": 230, "top_tracks": ["No Voy en Tren", "Rezo por Vos", "Promesas Sobre El Bidet", "Raros Peinados Nuevos", "Nos Siguen Pegando Abajo"]}, "Tears For Fears": {"hours": 7.5, "plays": 108, "top_tracks": ["Sowing The Seeds Of Love", "Head Over Heels", "Everybody Wants To Rule The World", "Advice For The Young At Heart", "Pale Shelter"]}, "Yes": {"hours": 7.5, "plays": 106, "top_tracks": ["Owner of a Lonely Heart", "Roundabout - 2024 Remaster", "Leave It"]}, "Fleetwood Mac": {"hours": 6.6, "plays": 107, "top_tracks": ["The Chain - 2004 Remaster", "Dreams - 2004 Remaster", "Big Love - 2017 Remaster", "You Make Loving Fun - 2004 Remaster", "Hypnotized"]}, "Pa2k": {"hours": 17.9, "plays": 573, "top_tracks": ["Mala", "Energy!", "si te deja sola", "She Said", "shhhine"]}, "Megadeth": {"hours": 7.0, "plays": 105, "top_tracks": ["Symphony Of Destruction - Remastered 2012", "Trust - Remastered 2004 / Remixed", "Peace Sells - Remastered", "A Tout Le Monde - Remastered 2004", "She-Wolf - Remastered 2004 / Remixed"]}, "Don Omar": {"hours": 10.5, "plays": 185, "top_tracks": ["Dile", "How We Roll", "Bandoleros", "Virtual Diva", "Salió El Sol"]}, "Biowaverave": {"hours": 14.1, "plays": 352, "top_tracks": ["Una Como Tu", "Banco!", "Ácido!", "No Quiero Esa Hoe", "Nunca Fuiste Mia"]}, "Viejas Locas": {"hours": 13.9, "plays": 252, "top_tracks": ["¿Qué Vas A Hacer Tan Sola Hoy?", "Me Gustas Mucho", "Homero", "Nena, Me Gustas Así", "Perra"]}, "Bon Jovi": {"hours": 5.7, "plays": 94, "top_tracks": ["Livin' On A Prayer", "You Give Love A Bad Name", "Wanted Dead Or Alive", "Runaway", "Never Say Goodbye"]}, "System Of A Down": {"hours": 8.0, "plays": 153, "top_tracks": ["Aerials", "Lonely Day", "Toxicity", "B.Y.O.B.", "Chop Suey!"]}, "Ice Cube": {"hours": 18.3, "plays": 301, "top_tracks": ["It Was A Good Day", "You Know How We Do It", "Check Yo Self - Remix", "No Vaseline", "Ain't Got No Haters (feat. Too Short)"]}, "COSMIC KID": {"hours": 11.9, "plays": 330, "top_tracks": ["BRINCANDO", "CONTENT EXPLICIT", "SPACE SEX", "NAMORE", "COSMIC GIRL"]}, "Eagles": {"hours": 5.0, "plays": 66, "top_tracks": ["One of These Nights - 2013 Remaster", "Hotel California - 2013 Remaster", "I Can't Tell You Why - 2013 Remaster", "New Kid in Town - 2013 Remaster", "Life in the Fast Lane - 2013 Remaster"]}, "The Verve": {"hours": 5.8, "plays": 80, "top_tracks": ["Sonnet - Live", "Bitter Sweet Symphony - Remastered 2016", "Sonnet", "Bitter Sweet Symphony - Live", "Bitter Sweet Symphony - Radio Edit"]}, "Metro Boomin": {"hours": 8.3, "plays": 175, "top_tracks": ["Too Many Nights (feat. Don Toliver & with Future)", "Overdue (with Travis Scott)", "Trance (with Travis Scott & Young Thug)", "Around Me (feat. Don Toliver)", "Space Cadet (feat. Gunna)"]}, "Drake": {"hours": 12.3, "plays": 222, "top_tracks": ["Jimmy Cooks (feat. 21 Savage)", "Passionfruit", "Flight's Booked", "Push Ups", "You Broke My Heart"]}, "Stone Temple Pilots": {"hours": 5.0, "plays": 82, "top_tracks": ["Sex Type Thing - 2017 Remaster", "Plush", "Creep - 2017 Remaster", "Wicked Garden - 2017 Remaster", "Big Empty - 2019 Remaster"]}, "America": {"hours": 6.4, "plays": 112, "top_tracks": ["A Horse with No Name", "Ventura Highway", "You Can Do Magic", "Tin Man", "Three Roses"]}, "Dire Straits": {"hours": 5.1, "plays": 59, "top_tracks": ["Money For Nothing - Remastered 1996", "Six Blade Knife", "Your Latest Trick - Remastered 1996", "Sultans Of Swing - Live At The BBC", "Money For Nothing - Live Version"]}, "54 Ultra": {"hours": 4.3, "plays": 90, "top_tracks": ["Upside Down", "Turnaround", "Heaven Knows", "Find Your Love", "Talk 2 Me"]}, "Is Dead": {"hours": 11.5, "plays": 433, "top_tracks": ["Zuper delicioso !", "Yho", "Tusilueta<\\3", "Kolor pink", "Tewo a comer !"]}, "Jósean Log": {"hours": 11.8, "plays": 221, "top_tracks": ["Doma", "Beso", "Si Hay Algo", "Alguien Como Tú", "Pruébame a Ti"]}, "Trueno": {"hours": 12.6, "plays": 266, "top_tracks": ["CRUZ", "Mamichula - con Nicki Nicole", "SOLO POR VOS", "Rain", "REAL GANGSTA LOVE"]}, "A Flock Of Seagulls": {"hours": 9.1, "plays": 119, "top_tracks": ["I Ran (So Far Away)", "Space Age Love Song"]}, "Hotel Ugly": {"hours": 11.3, "plays": 236, "top_tracks": ["I Think I Left the Stove On", "Shut up My Moms Calling", "The Ballad of Eddie Jabuley", "Stevie Doesn't Wonder", "Piggypink"]}, "Led Zeppelin": {"hours": 4.4, "plays": 56, "top_tracks": ["Whole Lotta Love - 1990 Remaster", "Black Dog - Remaster", "Stairway to Heaven - Remaster", "Dazed and Confused - 1990 Remaster", "All My Love - Remaster"]}, "Rmarck": {"hours": 11.3, "plays": 277, "top_tracks": ["Bloqueándonos", "Déjalo", "Tienes k irte", "En 5", "Bae"]}, "Steely Dan": {"hours": 4.1, "plays": 61, "top_tracks": ["Do It Again", "Home At Last", "Only A Fool Would Say That", "Hey Nineteen", "Rikki Don't Lose That Number"]}, "Pink Floyd": {"hours": 5.2, "plays": 81, "top_tracks": ["Breathe (In the Air)", "Comfortably Numb", "The Great Gig in the Sky", "Another Brick in the Wall, Pt. 2", "Have a Cigar"]}, "Naked Eyes": {"hours": 4.8, "plays": 80, "top_tracks": ["Promises, Promises - US Single Version", "Promises, Promises", "(What) In the Name of Love"]}, "Azumi Takahashi": {"hours": 3.4, "plays": 62, "top_tracks": ["It's Going Down Now", "Full Moon Full Life", "When The Moon's Reaching Out Stars -Reload-", "Memories of You -Reload-", "Changing Seasons -Reload-"]}, "Daddy Yankee": {"hours": 7.9, "plays": 151, "top_tracks": ["Lo Que Pasó, Pasó", "Ella Me Levanto", "Pose", "Ella Me Levantó", "La Despedida"]}, "Chris Isaak": {"hours": 4.7, "plays": 70, "top_tracks": ["Wicked Game", "Lie To Me", "Can't Do A Thing", "Wicked Game - Live", "Blue Spanish Sky"]}, "UNIVERSE": {"hours": 13.4, "plays": 418, "top_tracks": ["NUBE", "Perro Solo", "McDuck", "Amarelo", "TEKILA"]}, "Bajofondo": {"hours": 4.4, "plays": 68, "top_tracks": ["El Mareo", "Zitarrosa", "Chiquilines", "Pa' Bailar", "Fairly Right"]}, "Kevin Kaarl": {"hours": 11.1, "plays": 167, "top_tracks": ["Esta noche", "siento tanto aquí", "búscame otra vez", "piensa en mí de vez en cuando", "no me culpes por sentir"]}, "Oney1": {"hours": 10.5, "plays": 227, "top_tracks": ["Antes de Noviembre", "Decime cuál fue", "DESPUES DE NOVIEMBRE", "NO EXISTEN DOS", "JOVEN ETO'O"]}, "Limp Bizkit": {"hours": 5.1, "plays": 88, "top_tracks": ["Rollin' (Air Raid Vehicle)", "Take A Look Around", "Break Stuff", "Nookie", "It'll Be OK"]}, "Simply Red": {"hours": 4.0, "plays": 65, "top_tracks": ["Stars", "Sunrise", "Something Got Me Started - 2008 Remaster", "Holding Back the Years - 2008 Remaster", "Holding Back the Years - Live at Sydney Opera House"]}, "Tory Lanez": {"hours": 5.7, "plays": 100, "top_tracks": ["The Color Violet", "Lavender Sunflower", "Lady Of Namek", "Hurts Me", "Roses - Lost Tapes 2022"]}, "Cutting Crew": {"hours": 8.0, "plays": 106, "top_tracks": ["(I Just) Died In Your Arms", "I've Been In Love Before"]}, "Los Abuelos De La Nada": {"hours": 8.7, "plays": 197, "top_tracks": ["Mil Horas - 1994 Remastered Version", "Costumbres Argentinas - 1994 Remastered Version", "Lunes Por La Madrugada", "Mil Horas", "Así Es El Calor - 1994 Remastered Version"]}, "Playboi Carti": {"hours": 10.9, "plays": 265, "top_tracks": ["Location", "ILoveUIHateU", "Sky", "Magnolia", "R.I.P."]}, "Nirvana": {"hours": 5.1, "plays": 92, "top_tracks": ["Come As You Are", "Heart-Shaped Box", "In Bloom", "Drain You", "About A Girl"]}, "The Psychedelic Furs": {"hours": 4.4, "plays": 77, "top_tracks": ["Love My Way"]}, "Kool & The Gang": {"hours": 4.5, "plays": 70, "top_tracks": ["Summer Madness", "Ladies Night", "Get Down On It", "Fresh", "You Don't Have To Change"]}, "Wham!": {"hours": 4.1, "plays": 53, "top_tracks": ["Everything She Wants", "Everything She Wants - Remix", "Last Christmas"]}, "Philip Bailey": {"hours": 3.9, "plays": 51, "top_tracks": ["Easy Lover", "Easy Lover - Extended Dance Remix"]}, "Eminem": {"hours": 14.9, "plays": 234, "top_tracks": ["Superman", "Mockingbird", "Without Me", "My Name Is", "The Real Slim Shady"]}, "Kanye West": {"hours": 7.3, "plays": 132, "top_tracks": ["Late", "I Wonder", "Devil In A New Dress", "Father Stretch My Hands Pt. 1", "Flashing Lights"]}, "Franz Ferdinand": {"hours": 7.0, "plays": 128, "top_tracks": ["Take Me Out", "This Fire", "The Dark Of The Matinée", "No You Girls", "Do You Want To"]}, "Fito Paez": {"hours": 7.8, "plays": 146, "top_tracks": ["Giros", "11 Y 6", "Al lado del camino", "Dos en la ciudad", "Polaroid De Locura Ordinaria"]}, "Rod Stewart": {"hours": 6.9, "plays": 86, "top_tracks": ["Young Turks", "Young Turks - 2008 Remaster", "Da Ya Think I'm Sexy?", "Baby Jane - 2008 Remaster", "Every Beat of My Heart"]}, "Soundgarden": {"hours": 3.9, "plays": 51, "top_tracks": ["Black Hole Sun", "Fell On Black Days", "Outshined - Remastered 2016", "The Day I Tried To Live", "Room A Thousand Years Wide - Remastered 2016"]}, "10cc": {"hours": 3.5, "plays": 38, "top_tracks": ["I'm Not In Love", "Green Eyed Monster"]}, "Pescado Rabioso": {"hours": 6.2, "plays": 107, "top_tracks": ["Bajan", "Cementerio Club", "Post-Crucifixion", "Las Habladurias del Mundo", "Cantata de Puentes Amarillos"]}, "Earth, Wind & Fire": {"hours": 3.8, "plays": 63, "top_tracks": ["Boogie Wonderland (with The Emotions)", "Can't Let Go", "Let's Groove", "Fantasy", "After the Love Has Gone"]}, "Basement": {"hours": 3.8, "plays": 64, "top_tracks": ["Covet", "Are You The One", "WIRED"]}, "Meldrop": {"hours": 3.6, "plays": 59, "top_tracks": ["Goodman", "Rose Baby", "Switch It Up", "Tuncap", "Medchill"]}, "Spandau Ballet": {"hours": 3.8, "plays": 60, "top_tracks": ["Gold", "True - 2003 Remaster", "Only When You Leave - 2010 Remaster", "Gold - 2003 Remaster", "Code of Love - 2003 Remaster"]}, "Lotus Juice": {"hours": 2.7, "plays": 48, "top_tracks": ["Color Your Night", "Do For Love (feat. Yumi Kawamura) - 2022 Remaster - English Ver.", "Iwatodai Dorm -Reload-", "Deep Breath Deep Breath -Reincarnation Reload-", "Mass Destruction -Reload-"]}, "Guns N' Roses": {"hours": 7.3, "plays": 93, "top_tracks": ["Welcome To The Jungle", "Estranged", "Sweet Child O' Mine", "Paradise City", "November Rain"]}, "Tomoko Aran": {"hours": 3.5, "plays": 47, "top_tracks": ["Midnight Pretenders", "Body to Body", "Slow Nights", "I'm in Love", "ひと夏のタペストリー"]}, "Electric Light Orchestra": {"hours": 7.3, "plays": 109, "top_tracks": ["Last Train to London", "Four Little Diamonds", "Evil Woman", "Showdown - 2003 Remaster", "Mr. Blue Sky"]}, "The Rolling Stones": {"hours": 4.2, "plays": 69, "top_tracks": ["Miss You - Remastered", "Paint It, Black", "(I Can't Get No) Satisfaction - Mono", "Start Me Up - Remastered 2009", "Angie - Remastered 2009"]}, "piri": {"hours": 3.6, "plays": 79, "top_tracks": ["words - Higgo Remix", "on & on", "soft spot - MJ Cole Remix", "updown", "say it"]}, "INXS": {"hours": 4.3, "plays": 74, "top_tracks": ["Kiss The Dirt (Falling Down The Mountain)", "Never Tear Us Apart - Live At Wembley Stadium, 1991", "Need You Tonight", "Suicide Blonde - Live At Wembley Stadium, 1991", "Suicide Blonde"]}, "Blur": {"hours": 3.8, "plays": 55, "top_tracks": ["Beetlebum - 2012 Remaster", "Coffee & TV", "There's No Other Way - 2012 Remaster", "Girls & Boys", "Song 2 - 2012 Remaster"]}, "Chris Rainbow": {"hours": 3.1, "plays": 46, "top_tracks": ["Be Like a Woman", "Don't Take the Night Away", "Streetwise", "Give a Little More - KPM Studio Demo", "White Trails"]}, "La Renga": {"hours": 8.3, "plays": 108, "top_tracks": ["Balada Del Diablo y La Muerte", "Triste Canción De Amor", "El Final Es En Donde Partí", "El Revelde", "Veneno"]}, "21 Savage": {"hours": 13.2, "plays": 226, "top_tracks": ["redrum", "Rich Nigga Shit (feat. Young Thug)", "Glock In My Lap", "Runnin", "née-nah"]}, "Red Hot Chili Peppers": {"hours": 3.9, "plays": 66, "top_tracks": ["Californication", "Can't Stop", "Under the Bridge", "Otherside", "Dark Necessities"]}, "Airbag": {"hours": 8.3, "plays": 148, "top_tracks": ["Verte De Cerca", "Por Mil Noches", "Cae el Sol", "Cicatrices", "Pensamientos"]}, "Kidd Voodoo": {"hours": 7.4, "plays": 109, "top_tracks": ["Debo Aterrizar", "Minnie 2", "Me Mareo", "LTD", "Modales"]}, "Feid": {"hours": 9.1, "plays": 211, "top_tracks": ["CUAL ES ESA", "SORRY 4 THAT MUCH", "CLASSY 101", "CHORRITO PA LAS ANIMAS", "LUNA"]}, "binki": {"hours": 3.2, "plays": 74, "top_tracks": ["Landline", "Marco", "Heybb!", "Revolve", "Clay Pigeon"]}, "REO Speedwagon": {"hours": 3.5, "plays": 65, "top_tracks": ["Keep on Loving You", "Can't Fight This Feeling"]}, "Jalen Ngonda": {"hours": 2.8, "plays": 63, "top_tracks": ["If You Don't Want My Love", "Just Like You Used To", "Come Around and Love Me", "Here To Stay", "So Glad I Found You"]}, "Adele": {"hours": 3.4, "plays": 43, "top_tracks": ["Skyfall"]}, "Davus": {"hours": 7.6, "plays": 189, "top_tracks": ["Chapón", "Counter Strike", "Mala mía", "Agora", "Fly!"]}, "Lil Tecca": {"hours": 8.3, "plays": 227, "top_tracks": ["500lbs", "Down With Me", "NEVER LAST", "LOT OF ME", "TASTE"]}, "The Charities": {"hours": 2.5, "plays": 61, "top_tracks": ["Angel Eyes", "Bring Your Love", "It's Not Our Time", "Loveliness", "Of All The Hearts"]}, "Vacations": {"hours": 9.9, "plays": 214, "top_tracks": ["Telephones", "Relax", "Young", "Away", "Home"]}, "The Notorious B.I.G.": {"hours": 8.1, "plays": 127, "top_tracks": ["Big Poppa - 2005 Remaster", "Hypnotize - 2014 Remaster", "Juicy - 2005 Remaster", "Who Shot Ya? - 2005 Remaster", "Nasty Girl (feat. Diddy, Nelly, Jagged Edge & Avery Storm) - 2005 Remaster"]}, "R.E.M.": {"hours": 3.8, "plays": 57, "top_tracks": ["Losing My Religion", "Losing My Religion - Live At The Point Depot, Dublin, Ireland / February, 2005", "Everybody Hurts - Live At The Point Depot, Dublin, Ireland / February, 2005", "Losing My Religion 2 - Demo", "Everybody Hurts"]}, "Dr. Dre": {"hours": 7.5, "plays": 129, "top_tracks": ["Keep Their Heads Ringin'", "Nuthin' But A \"G\" Thang", "Still D.R.E.", "Xxplosive", "Fuck Wit Dre Day (And Everybody's Celebratin')"]}, "Los Piojos": {"hours": 6.8, "plays": 109, "top_tracks": ["El Farolito", "Tan Solo", "Como Alí", "Desde Lejos No Se Ve", "Bicho de Ciudad"]}, "George Benson": {"hours": 2.8, "plays": 44, "top_tracks": ["Give Me the Night", "Turn Your Love Around", "Midnight Love Affair", "Breezin'", "Love X Love"]}, "Delegation": {"hours": 2.7, "plays": 32, "top_tracks": ["Oh Honey", "You and I", "It Only Happens", "We Can Make It", "Put a Little Love On Me"]}, "Bread Beatz": {"hours": 12.7, "plays": 328, "top_tracks": ["Love Game - Slowed", "Self", "Government Hooker", "When I'm With You", "Love Game"]}, "Talk Talk": {"hours": 3.3, "plays": 50, "top_tracks": ["Life's What You Make It - 1997 Remaster", "It's My Life - 1997 Remaster", "It's My Life", "It's My Life - Extended Mix", "Such a Shame"]}, "Steve Lacy": {"hours": 9.7, "plays": 275, "top_tracks": ["Some", "Infrunami", "C U Girl", "Dark Red", "Uuuu"]}, "Willie Colón": {"hours": 4.6, "plays": 64, "top_tracks": ["Oh Qué Será?", "El Día De Mi Suerte", "El Gran Varón", "Pedro Navaja", "Sin Poderte Hablar"]}, "Intoxicados": {"hours": 6.3, "plays": 96, "top_tracks": ["No Tengo Ganas", "Nunca quise", "Esta Saliendo El Sol", "Fuego", "Las cosas que no se tocan"]}, "mikeeysmind": {"hours": 11.9, "plays": 220, "top_tracks": ["Resonance x Genesis x Not allowed - Slowed", "#doyalike", "VVV", "HARDY BOYS", "wat u want 2"]}, "Plan B": {"hours": 9.1, "plays": 182, "top_tracks": ["Es un Secreto", "Si No Le Contesto", "Por Que Te Demoras?", "Candy", "Fanatica Sensual"]}, "Monophonics": {"hours": 2.3, "plays": 33, "top_tracks": ["It's Only Us", "La La La Love Me", "Sage Motel", "Broken Boundaries", "The Shape Of My Teardrops"]}, "Brent Faiyaz": {"hours": 5.0, "plays": 130, "top_tracks": ["Upset (feat. Tommy Richman & FELIX!)", "Best Time", "Forever Yours", "Paper Soldier (feat. Joony)", "Clouded"]}, "White Lies": {"hours": 2.4, "plays": 36, "top_tracks": ["Death", "Farewell To The Fairground"]}, "David Bowie": {"hours": 2.9, "plays": 35, "top_tracks": ["Let's Dance - 2018 Remaster", "China Girl - 2018 Remaster", "Heroes - 2017 Remaster", "Fame - 2016 Remaster", "Starman - 2012 Remaster"]}, "Daft Punk": {"hours": 5.4, "plays": 108, "top_tracks": ["End of Line", "Around the World", "Voyager", "Get Lucky (Radio Edit) [feat. Pharrell Williams and Nile Rodgers]", "Veridis Quo"]}, "Lenny Kravitz": {"hours": 3.0, "plays": 52, "top_tracks": ["It Ain't Over 'Til It's Over", "Low", "Are You Gonna Go My Way", "Stillness Of Heart", "I Belong To You"]}, "Los Bunkers": {"hours": 6.8, "plays": 124, "top_tracks": ["Ven Aquí", "Nada Nuevo Bajo El Sol", "Llueve Sobre La Ciudad", "Bailando Solo", "Ven aquí"]}, "Frankie Ruiz": {"hours": 4.6, "plays": 73, "top_tracks": ["Tú Con Él", "Tú Con El", "La Cura", "Deseándote", "Desnúdate Mujer"]}, "Jordan Lee": {"hours": 2.4, "plays": 49, "top_tracks": ["Love Ride", "Rear-View-Mirror", "Easy", "Amen", "In Between Feelings"]}, "sho": {"hours": 8.0, "plays": 266, "top_tracks": ["ascension", "noir", "noir - sl0wed down", "blanc - Slowed", "rouge - Slowed"]}, "Everything But The Girl": {"hours": 2.3, "plays": 52, "top_tracks": ["Each And Every One", "Missing", "Missing - Todd Terry Club Mix", "Come on Home"]}, "Laura Branigan": {"hours": 4.9, "plays": 79, "top_tracks": ["Self Control", "Self Control - Extended Version"]}, "Luther Vandross": {"hours": 2.8, "plays": 43, "top_tracks": ["Never Too Much", "She's a Super Lady", "Better Love", "I've Been Working", "See Me"]}, "Phil Collins": {"hours": 3.0, "plays": 39, "top_tracks": ["Another Day in Paradise - 2016 Remaster", "In The Air Tonight - 2015 Remastered", "In the Air Tonight - Live from the Serious Tour 1990; 2019 Remaster", "Sussudio - 2016 Remaster", "I Don't Care Anymore - 2016 Remaster"]}, "LNRT": {"hours": 2.6, "plays": 58, "top_tracks": ["All Night Long", "Players Only", "This Is What U Waitin' For", "Call Me", "The Cigarette"]}, "Bardero$": {"hours": 6.9, "plays": 153, "top_tracks": ["Aquella Noche", "DAMELO", "Esperanza", "Olvido", "Salud"]}, "Los Fabulosos Cadillacs": {"hours": 6.8, "plays": 113, "top_tracks": ["Vasos Vacíos - Remasterizado 2008", "Siguiendo la Luna - Remasterizado 2008", "Radio Kriminal - Remasterizado 2008", "Manuel Santillán, el León (Versión Reggae) - Remasterizado 2008", "Mal Bicho - Remasterizado 2008"]}, "Cris Mj": {"hours": 8.6, "plays": 197, "top_tracks": ["SI NO ES CONTIGO", "Daytona", "Una Noche en Medellín", "Marisola - Remix", "No Ponga Excusas"]}, "Rauw Alejandro": {"hours": 4.9, "plays": 107, "top_tracks": ["Qué Pasaría...", "Dile a El", "DILUVIO", "La Old Skul", "MÁS DE UNA VEZ"]}, "Spinetta Y Los Socios Del Desierto": {"hours": 3.8, "plays": 57, "top_tracks": ["Cheques", "Mi Sueño de Hoy", "Perdido En Ti", "Paraíso", "Ven Vení"]}, "Rata Blanca": {"hours": 5.7, "plays": 71, "top_tracks": ["Mujer Amante", "Aún Estás En Mis Sueños", "Mujer Amante - Vivo", "Talismán"]}, "Eslabon Armado": {"hours": 10.4, "plays": 203, "top_tracks": ["Diciembre", "Jugaste y Sufrí", "Una Peda", "Ella Baila Sola", "Con Tus Besos"]}, "Tainy": {"hours": 7.5, "plays": 127, "top_tracks": ["MOJABI GHOST", "MONSTRUO", "PARANORMAL", "Sci-Fi", "Lo Siento BB:/"]}, "Ambrosia": {"hours": 2.0, "plays": 31, "top_tracks": ["Holdin' on to Yesterday", "How Much I Feel", "You're the Only Woman - You & I", "Biggest Part of Me", "Livin' on My Own"]}, "The Doobie Brothers": {"hours": 2.1, "plays": 36, "top_tracks": ["What a Fool Believes", "Long Train Runnin'", "Minute by Minute", "Dark Eyed Cajun Woman", "You Belong to Me"]}, "Rad&Co": {"hours": 2.5, "plays": 42, "top_tracks": ["Darling", "Love GT", "Unspoken Thoughts", "Alchemy", "Bulletproof"]}, "No Te Va Gustar": {"hours": 6.4, "plays": 116, "top_tracks": ["Ese Maldito Momento", "A las Nueve", "Chau", "Tan Lejos", "Ángel Con Campera"]}, "Men I Trust": {"hours": 4.1, "plays": 86, "top_tracks": ["Show Me How", "Oncle Jazz", "Seven", "Lauren", "I Hope to Be Around"]}, "Kingo Hamada": {"hours": 2.3, "plays": 36, "top_tracks": ["抱かれに来た女", "midnight cruisin'", "街のドルフィン", "街のドルフィン - 2020 Remaster", "グッド・ラック・シティ・ロマンス - 2020 Remaster"]}, "Julius Popper": {"hours": 3.5, "plays": 54, "top_tracks": ["La Innombrable", "Cielo Azul", "Huke", "Sol Menor", "La Culebra"]}, "Rick James": {"hours": 2.2, "plays": 33, "top_tracks": ["Give It To Me Baby", "Ghetto Life", "Super Freak", "Cold Blooded", "Mary Jane"]}, "Héctor \"El Father\"": {"hours": 2.4, "plays": 44, "top_tracks": ["El Teléfono", "Noche de Travesura", "Maldades", "Hola Bebé"]}, "Live": {"hours": 2.1, "plays": 40, "top_tracks": ["Deep Enough"]}, "Mac Miller": {"hours": 8.5, "plays": 131, "top_tracks": ["Congratulations (feat. Bilal)", "Self Care", "Small Worlds", "The Spins", "Blue World"]}, "El Alfa": {"hours": 9.5, "plays": 220, "top_tracks": ["Singapur", "Dembow y Reggaeton", "Los Aparatos", "Recogelo", "Besalo"]}, "Mon Laferte": {"hours": 5.9, "plays": 93, "top_tracks": ["Tormento", "Flaco", "Amor Completo", "Pa’ Dónde Se Fue", "Tu Falta De Querer"]}, "Pet Shop Boys": {"hours": 2.5, "plays": 36, "top_tracks": ["West End Girls - 2018 Remaster", "Domino Dancing", "West End Girls - Live at the O2 Arena, London - 21 December 2009", "Love Comes Quickly - 2018 Remaster", "My October Symphony - 2018 Remaster"]}, "Blondie": {"hours": 2.6, "plays": 41, "top_tracks": ["Atomic", "Call Me", "Rapture", "Heart Of Glass - Remix", "One Way Or Another"]}, "Childish Gambino": {"hours": 5.8, "plays": 80, "top_tracks": ["Me and Your Mama", "Redbone", "Les", "Heartbeat", "Cruisin' (feat. Yeat)"]}, "Mariya Takeuchi": {"hours": 2.6, "plays": 38, "top_tracks": ["Plastic Love", "Shiawasenomonosashi", "夢の続き", "プラスティック・ラブ", "September"]}, "Pantera": {"hours": 2.2, "plays": 23, "top_tracks": ["This Love", "Cemetery Gates", "10's", "Floods", "Hollow"]}, "El Soldado": {"hours": 5.7, "plays": 79, "top_tracks": ["Angel de los Perdedores", "Ella Es", "Boleto de Empeño"]}, "berlioz": {"hours": 3.2, "plays": 66, "top_tracks": ["deep in it", "miro", "hot slow", "jazz is for ordinary people", "wash my sins away"]}, "Los Auténticos Decadentes": {"hours": 5.7, "plays": 91, "top_tracks": ["Loco (Tu Forma De Ser)", "Un Osito de Peluche de Taiwán", "Los Piratas", "La Guitarra", "No Me Importa el Dinero (feat. Julieta Venegas) - Vivo en el Palacio de los Deportes"]}, "Bersuit Vergarabat": {"hours": 4.3, "plays": 75, "top_tracks": ["Toco Y Me Voy", "La Soledad", "Sr. Cobranza", "Vuelos", "Un Pacto - Live In Buenos Aires / 2001"]}, "Common Saints": {"hours": 1.7, "plays": 25, "top_tracks": ["Summer Sun", "Starchild", "Idol Eyes", "Firebird", "Rebel Paradise"]}, "Jarabe De Palo": {"hours": 8.2, "plays": 128, "top_tracks": ["El lado oscuro", "La flaca", "Dos Días en la Vida"]}, "Mike Lamadrid": {"hours": 6.3, "plays": 175, "top_tracks": ["Pausa", "Música de Elevador", "Ojos Vendados", "Rap Chill", "777 Freestyle"]}, "Marvin Gaye": {"hours": 2.2, "plays": 39, "top_tracks": ["I Want You", "Mercy Mercy Me (The Ecology)", "Where Are We Going?", "What's Going On", "Ain't No Mountain High Enough"]}, "Yeat": {"hours": 8.8, "plays": 197, "top_tracks": ["If We Being Rëal", "Out thë way", "Already Rich", "On tha linë", "Nun id change"]}, "Maluma": {"hours": 6.4, "plays": 133, "top_tracks": ["El Perdedor", "Borro Cassette", "Corazón (feat. Nego do Borel)", "Cuatro Babys (feat. Trap Capos, Noriel, Bryant Myers & Juhn)", "Sin Contrato"]}, "Viuta": {"hours": 1.6, "plays": 27, "top_tracks": ["Eyes Are Everything", "Never Die", "She Worships Saturn", "Elephant Man", "Something On Me"]}, "Los Cafres": {"hours": 4.2, "plays": 73, "top_tracks": ["Casi q' me pierdo", "Tus Ojos", "Si El Amor Se Cae", "Aire", "Bastará"]}, "TV Girl": {"hours": 7.1, "plays": 131, "top_tracks": ["Lovers Rock", "Blue Hair", "Cigarettes out the Window", "Not Allowed", "The Blonde"]}, "Lisa Ono": {"hours": 8.7, "plays": 155, "top_tracks": ["Garota de Ipanema - 2006 Version", "キエンセラ", "ベサメ・ムーチョ", "GAROTA DE IPANEMA - 2006 Version", "フレネシー"]}, "soffyy": {"hours": 4.6, "plays": 120, "top_tracks": ["Summer Hit", "popstar x lujoso", "soffyy type beat", "xtu voluntad", "No Exclusiv€"]}, "Zoé": {"hours": 6.9, "plays": 120, "top_tracks": ["Labios Rotos - En Vivo Desde México / 2010", "Soñé - En Vivo", "Venus", "Azul", "Miel"]}, "Scorpions": {"hours": 2.7, "plays": 45, "top_tracks": ["Rock You Like A Hurricane", "No One Like You", "Still Loving You", "Wind Of Change", "Always Somewhere"]}, "Malcolm Todd": {"hours": 1.8, "plays": 33, "top_tracks": ["Roommates", "Earrings", "Sweet Boy", "4Me 4Me", "Chest Pain (I Love)"]}, "Zeballos": {"hours": 5.2, "plays": 85, "top_tracks": ["Eclipse", "Piel", "Nadir"]}, "Callejeros": {"hours": 4.6, "plays": 78, "top_tracks": ["Creo", "9 de Julio", "Prohibido", "Rocanroles Sin Destino", "Imposible"]}, "hako": {"hours": 8.1, "plays": 283, "top_tracks": ["listen! - sped up", "stunning. - sped up", "egotistical", "separate", "listen!"]}, "Adrian": {"hours": 8.4, "plays": 233, "top_tracks": ["9am in Calabasas", "7AM", "Streets", "Universe at 9pm", "9am in Calabasas (Sped Up)"]}, "Danzig": {"hours": 1.6, "plays": 29, "top_tracks": ["Mother", "She Rides", "Bodies", "Tired Of Being Alive", "The Hunter"]}, "Los Prisioneros": {"hours": 3.7, "plays": 52, "top_tracks": ["Tren Al Sur", "Estrechez De Corazón", "Cuentame Una Historia Original", "Amiga Mía", "Por Qué No Se Van"]}, "Superheaven": {"hours": 1.9, "plays": 31, "top_tracks": ["Youngest Daughter", "Leach", "Next To Nothing", "Room", "Downswing"]}, "Angel Y Khriz": {"hours": 2.8, "plays": 52, "top_tracks": ["Muevela", "Na De Na", "Ven Bailalo - Reggaeton Mix"]}, "Bryan Adams": {"hours": 2.3, "plays": 37, "top_tracks": ["Run To You", "Run To You (Classic Version)", "Heaven", "Somebody", "Run To You - Live"]}, "Tego Calderón": {"hours": 2.4, "plays": 52, "top_tracks": ["Pa' Que Retozen", "Punto y Aparte", "Llora, Llora", "La Receta", "Al Natural (feat. Yandel)"]}, "Grupo Niche": {"hours": 5.6, "plays": 86, "top_tracks": ["Sin Sentimientos", "Cali Pachanguero", "Ana Mile", "Busca Por Dentro", "Gotas De Lluvia"]}, "Memphis La Blusera": {"hours": 1.7, "plays": 27, "top_tracks": ["La Última Lágrima", "Traigo gasolina", "La Bifurcada", "Montón de nada - En Vivo"]}, "Bruno Mars": {"hours": 2.8, "plays": 55, "top_tracks": ["Locked out of Heaven", "That's What I Like", "Finesse", "When I Was Your Man", "I Just Might"]}, "Stardust": {"hours": 7.0, "plays": 78, "top_tracks": ["Music Sounds Better With You", "Music Sounds Better With You - Radio Edit"]}, "Pearl Jam": {"hours": 1.8, "plays": 23, "top_tracks": ["Black", "Even Flow", "Garden", "Alive - Pearl Jam Live On 10 Legs", "Alive"]}, "Tyler, The Creator": {"hours": 4.4, "plays": 95, "top_tracks": ["See You Again (feat. Kali Uchis)", "Like Him (feat. Lola Young)", "EARFQUAKE", "BEST INTEREST", "NEW MAGIC WAND"]}, "Modjo": {"hours": 4.6, "plays": 67, "top_tracks": ["Lady - Hear Me Tonight", "No More Tears", "Savior Eyes", "Music Takes You Back", "Acknowledgement"]}, "Young Dune": {"hours": 4.3, "plays": 136, "top_tracks": ["adiccion", "GAS!", "wanna", "Sin Conexion", "pq estas asi?"]}, "Los Rodriguez": {"hours": 4.5, "plays": 70, "top_tracks": ["Sin documentos", "Para no olvidar", "Milonga del marinero y el capitán", "Aquí no podemos hacerlo", "Dulce condena"]}, "C.R.O": {"hours": 4.8, "plays": 97, "top_tracks": ["Ciudad Gris", "Vida", "Café", "Poesia de la Oscuridad", "Behind Me"]}, "Durand Jones & The Indications": {"hours": 1.6, "plays": 29, "top_tracks": ["Sea Gets Hotter", "Listen to Your Heart", "Flower Moon", "Ride or Die", "Court of Love"]}, "Héctor Lavoe": {"hours": 2.2, "plays": 22, "top_tracks": ["El Cantante", "Periódico De Ayer", "¿De Qué Tamaño Es Tu Amor?", "Juanito Alimaña", "Periódico de Ayer - Remastered 2024"]}, "Future": {"hours": 5.2, "plays": 94, "top_tracks": ["Like That", "Type Shit", "Solo", "PUFFIN ON ZOOTIEZ", "We Still Don't Trust You"]}, "Luis Alberto Spinetta": {"hours": 4.1, "plays": 92, "top_tracks": ["Barro Tal Vez", "Seguir Viviendo Sin Tu Amor", "Té para Tres (En Vivo Estadio Vélez Sarsfield) (feat. Gustavo Cerati)", "Rezo por Vos (En Vivo Estadio Vélez Sarsfield) (feat. Charly García)", "Cancion para los Días de la Vida"]}, "Audioslave": {"hours": 2.3, "plays": 33, "top_tracks": ["Like a Stone", "Show Me How to Live", "Be Yourself", "#1 Zero", "Black Hole Sun / Like a Stone - Live at Live 8, Siegessäule, Berlin, 2nd July 2005"]}, "DZY": {"hours": 4.2, "plays": 95, "top_tracks": ["Bonus Track"]}, "Mugshot": {"hours": 4.7, "plays": 83, "top_tracks": ["Branca", "Tell Me"]}, "The Jeremy Spencer Band": {"hours": 1.5, "plays": 22, "top_tracks": ["Cool Breeze", "Travellin'", "Sunshine", "Love Our Way Outta Here", "Flee"]}, "PXRKX": {"hours": 4.8, "plays": 161, "top_tracks": ["MARLBORO CLUB", "GRAND PRIX", "BUSINESS", "BORN TO RACE", "MONTE CARLO"]}, "Paul McCartney": {"hours": 1.9, "plays": 30, "top_tracks": ["Say Say Say - Remastered 2015", "Band On The Run - 2010 Remaster", "Another Day - 2012 Remaster", "Pretty Boys (feat. Khruangbin)", "Silly Love Songs/Silly Love Songs (Reprise) - Remastered 1993"]}, "C418": {"hours": 3.2, "plays": 64, "top_tracks": ["Sweden", "Aria Math", "Dry Hands", "Dreiton", "Key"]}, "Carla White": {"hours": 4.9, "plays": 52, "top_tracks": ["Can't Say Goodbye To Yesterday"]}, "Lynyrd Skynyrd": {"hours": 1.7, "plays": 16, "top_tracks": ["Free Bird", "Sweet Home Alabama", "Free Bird - Live At Oakland-Alameda County Coliseum/1977"]}, "Divididos": {"hours": 3.9, "plays": 57, "top_tracks": ["¿Qué Ves?", "Spaghetti del Rock", "Ala Delta", "Sábado", "El Arriero"]}, "Patrice Rushen": {"hours": 1.9, "plays": 24, "top_tracks": ["Forget Me Nots - Remastered", "Remind Me - Remastered", "Haven't You Heard", "Music of the Earth", "I Was Tired of Being Alone - Remastered"]}, "Masayoshi Takanaka": {"hours": 1.7, "plays": 25, "top_tracks": ["BREEZIN'", "トーキョーレギー", "OH! TENGO SUERTE", "憧れのセーシェル諸島", "I REMEMBER YOU"]}, "Whirr": {"hours": 1.5, "plays": 29, "top_tracks": ["Ease", "Leave"]}, "Tony Dize": {"hours": 3.7, "plays": 80, "top_tracks": ["Permitame (feat. Yandel)", "Solos (feat. Plan B)", "Permítame", "Quizas - Remix", "Solos"]}, "Myke Towers": {"hours": 4.9, "plays": 85, "top_tracks": ["ADIVINO", "Si Se Da - Remix", "LA FALDA", "Extasy", "DEGENERE 👑 (feat. benny blanco)"]}, "NBSPLV": {"hours": 6.7, "plays": 133, "top_tracks": ["The Lost Soul Down", "Lost Soul", "The Lost Soul Down - Speed Up", "The Lost Soul Down X Lost Soul", "The Lost Soul Down - Slowed & Reverb"]}, "Bee Gees": {"hours": 2.0, "plays": 34, "top_tracks": ["Night Fever - From \"Saturday Night Fever\" Soundtrack", "More Than A Woman", "You Should Be Dancing", "Stayin Alive", "Stayin' Alive - From \"Saturday Night Fever\" Soundtrack"]}, "Michael McDonald": {"hours": 1.5, "plays": 27, "top_tracks": ["I Keep Forgettin' (Every Time You're Near)", "I Gotta Try"]}, "benyi": {"hours": 3.7, "plays": 87, "top_tracks": ["perder el aliento", "el hoy", "viajo ligero", "contragolpe", "las horas son mi condena"]}, "BADBADNOTGOOD": {"hours": 4.0, "plays": 65, "top_tracks": ["Time Moves Slow", "In Your Eyes"]}, "CHIC": {"hours": 1.7, "plays": 20, "top_tracks": ["Soup for One", "Good Times", "I Want Your Love - 2018 Remaster", "Everybody Dance - 2018 Remaster", "Savoir Faire - 2018 Remaster"]}, "Marcos Valle": {"hours": 5.7, "plays": 71, "top_tracks": ["Estrelar"]}, "Romeo Santos": {"hours": 4.9, "plays": 88, "top_tracks": ["Necio (feat. Carlos Santana)", "Eres Mía", "Imitadora", "Hilito", "Odio (feat. Drake)"]}, "Foo Fighters": {"hours": 1.9, "plays": 32, "top_tracks": ["Everlong", "My Hero", "The Pretender", "All My Life", "Ain't It The Life"]}, "Pale Jay": {"hours": 1.3, "plays": 23, "top_tracks": ["Bewilderment", "Quadris De Ouro", "Shameful Game", "The Garden", "Donny In Valdez"]}, "El Gran Combo De Puerto Rico": {"hours": 2.1, "plays": 37, "top_tracks": ["Brujeria", "Un verano en Nueva York", "Y No Hago Mas Na'", "Me Liberé", "Trampolín"]}, "Duki": {"hours": 3.1, "plays": 78, "top_tracks": ["Ameri", "Vida De Rock", "Si Te Sentis Sola", "Pintao", "A Punta de Espada"]}, "Miranda!": {"hours": 3.3, "plays": 59, "top_tracks": ["Tu Misterioso Alguien", "Perfecta", "Don", "Triste", "Extraño"]}, "Dominic Fike": {"hours": 1.9, "plays": 69, "top_tracks": ["Babydoll", "Mama's Boy"]}, "venny": {"hours": 6.6, "plays": 175, "top_tracks": ["fedora", "sour haribos (Slowed + Reverb)", "akihabara", "fedora (Slowed + Reverb)", "sour haribos (Sped Up)"]}, "Aventura": {"hours": 5.7, "plays": 111, "top_tracks": ["Dile al Amor", "Su Veneno", "Obsesión (feat. Judy Santos)", "Obsesion", "Mi Corazoncito"]}, "Club Kuru": {"hours": 1.1, "plays": 17, "top_tracks": ["Film Credits", "Sunshine Kiss The Water", "Gone Like A Flower", "White Doves", "Morning Bird"]}, "C4STL3": {"hours": 4.2, "plays": 60, "top_tracks": ["My System (C4STL3 edit)", "Never Let Me Go"]}, "Grover Washington, Jr.": {"hours": 1.7, "plays": 17, "top_tracks": ["Just the Two of Us", "Just the Two of Us (feat. Bill Withers)"]}, "Eddie Santiago": {"hours": 5.2, "plays": 66, "top_tracks": ["Que Locura Enamorarme De Ti", "Lluvia", "Mía"]}, "Cris MJ": {"hours": 2.2, "plays": 49, "top_tracks": ["Vamo a Bailotear", "30 Mil Pies", "Daytona", "Conmigo Se Escapa", "SI NO ES CONTIGO - REMIX"]}, "Aaron May": {"hours": 3.5, "plays": 85, "top_tracks": ["Let Go", "I'm Good Luv, Enjoy.", "No Recognition", "Ride", "In Love"]}, "A$AP Rocky": {"hours": 3.3, "plays": 68, "top_tracks": ["I Smoked Away My Brain (I'm God x Demons Mashup) (feat. Imogen Heap & Clams Casino)", "Praise The Lord (Da Shine) (feat. Skepta)", "Sundress", "Everyday (feat. Rod Stewart, Miguel & Mark Ronson)", "Fashion Killa"]}, "Orange Dog Club": {"hours": 1.2, "plays": 19, "top_tracks": ["That's What I Get", "running out of time", "Gimme My Money"]}, "N.W.A.": {"hours": 3.9, "plays": 67, "top_tracks": ["Alwayz Into Somethin'", "Appetite For Destruction", "Chin Check", "Fuck Tha Police", "Straight Outta Compton"]}, "Ja Rule": {"hours": 5.2, "plays": 85, "top_tracks": ["Life Ain't A Game", "Furious", "Down A** B**ch", "Race Against Time", "Livin' It Up"]}, "Muse": {"hours": 2.4, "plays": 42, "top_tracks": ["Hysteria", "Uprising", "Supermassive Black Hole", "Map of the Problematique", "Starlight"]}, "Nothing": {"hours": 1.3, "plays": 24, "top_tracks": ["Vertigo Flowers", "toothless coal"]}, "Laufey": {"hours": 5.7, "plays": 130, "top_tracks": ["From The Start", "Falling Behind", "Valentine", "I Wish You Love", "Let You Break My Heart Again"]}, "Grandmaster Flash & The Furious Five": {"hours": 1.9, "plays": 19, "top_tracks": ["The Message (feat. Melle Mel & Duke Bootee)", "Scorpio"]}, "J Balvin": {"hours": 2.7, "plays": 49, "top_tracks": ["Si Tu Novio Te Deja Sola", "LA CANCIÓN", "QUE PRETENDES", "Ay Vamos", "6 AM"]}, "Adolescent's Orquesta": {"hours": 2.3, "plays": 35, "top_tracks": ["Virgen", "Persona Ideal", "Persona Ideal - Me Tengo Que Ir", "Se Acabó el Amor", "Aquel Lugar"]}, "Bell Biv DeVoe": {"hours": 2.7, "plays": 47, "top_tracks": ["Poison"]}, "León Larregui": {"hours": 4.0, "plays": 75, "top_tracks": ["Brillas", "Como Tú (Magic Music Box)", "Locos", "Birdie", "Carmín"]}, "Velvet Lune": {"hours": 1.1, "plays": 16, "top_tracks": ["Surface", "Blue Melody", "Eclipse", "Gloom", "Fin"]}, "La Vela Puerca": {"hours": 2.8, "plays": 46, "top_tracks": ["Zafar", "El Viejo", "Va A Escampar", "Clarobscuro"]}, "Mezz": {"hours": 4.0, "plays": 87, "top_tracks": ["Westcoast", "Mary", "Adiós", "Superheavy", "Alter Ego (Intro)"]}, "The Alan Parsons Project": {"hours": 1.5, "plays": 23, "top_tracks": ["I Wouldn't Want to Be Like You", "Eye In The Sky", "Games People Play", "Time", "Old and Wise"]}, "Queen": {"hours": 1.9, "plays": 34, "top_tracks": ["Cool Cat - Remastered 2011", "Under Pressure - Remastered 2011", "Another One Bites The Dust - Remastered 2011", "Good Old-Fashioned Lover Boy - Remastered 2011", "Bohemian Rhapsody - Remastered 2011"]}, "Whitesnake": {"hours": 1.5, "plays": 20, "top_tracks": ["Is This Love - 2018 Remaster", "Still of the Night - 2018 Remaster", "Here I Go Again - 1987 Version / 2018 Remaster", "Fool for Your Loving - 2011 Remaster", "Here I Go Again"]}, "Fazzini": {"hours": 3.7, "plays": 87, "top_tracks": ["Crazy", "Ey Mami", "Marihuana", "Crazy Love", "Mas Weed"]}, "Bleed": {"hours": 3.5, "plays": 93, "top_tracks": ["exclusi", "otra como tú", "bye_monotonía"]}, "Los Pericos": {"hours": 3.8, "plays": 63, "top_tracks": ["Pupilas Lejanas", "Sin Cadenas", "Waitin'", "Anónimos (feat. Carla Morrison)", "Runaway"]}, "suei": {"hours": 3.2, "plays": 85, "top_tracks": ["33", "No Me Gusta Esta Canción Pero Quiero Vivir Sin Ego (Puta Me Gustas)", "羽田 (Haneda) Freestyle", "4u", "22"]}, "Buckethead": {"hours": 1.1, "plays": 18, "top_tracks": ["Broken Mirror"]}, "Zion": {"hours": 1.4, "plays": 21, "top_tracks": ["More", "Zun Da Da", "Alócate"]}, "Tan Bionica": {"hours": 2.6, "plays": 50, "top_tracks": ["Loca", "Obsesionario en La Mayor", "La Melodía de Dios", "Arruinarse (feat. Airbag) - En Vivo En River Plate", "Ciudad Mágica"]}, "Organic Audio": {"hours": 3.2, "plays": 44, "top_tracks": ["Nurega"]}, "Christopher Cross": {"hours": 1.3, "plays": 18, "top_tracks": ["Ride Like the Wind", "Sailing", "The Light Is On"]}, "Las Pastillas del Abuelo": {"hours": 3.2, "plays": 44, "top_tracks": ["Rompecabezas de Amor", "Rompecabezas De Amor... - Live In Buenos Aires / 2016", "Viejo Karma!", "¿Qué es Dios?", "Ojos De Dragón!"]}, "Man Man": {"hours": 1.1, "plays": 31, "top_tracks": ["So It Goes", "Head On (Hold On To Your Heart)", "Feathers", "Van Helsing Boombox", "Cloud Nein"]}, "Inhaler": {"hours": 1.0, "plays": 14, "top_tracks": ["Totally", "Who's Your Money On? (Plastic House)", "Dublin in Ecstasy", "Your Power", "My King Will Be Kind"]}, "The Pointer Sisters": {"hours": 1.2, "plays": 21, "top_tracks": ["Hot Together", "Automatic", "Automatic - Single Version"]}, "Adalberto Santiago": {"hours": 4.8, "plays": 60, "top_tracks": ["La Noche Mas Linda"]}, "Ciro y los Persas": {"hours": 2.7, "plays": 43, "top_tracks": ["Antes y Después", "Me Gusta", "Mírenla", "Astros", "Caminando"]}, "Wang Chung": {"hours": 1.6, "plays": 24, "top_tracks": ["Dance Hall Days"]}, "Frank Sinatra": {"hours": 4.1, "plays": 105, "top_tracks": ["Fly Me To The Moon (In Other Words)", "The World We Knew (Over And Over)", "Somethin' Stupid", "My Way Of Life", "My Way"]}, "Dabeull": {"hours": 1.3, "plays": 23, "top_tracks": ["Let's Play", "Messages from the Stars", "Don't Forget It", "Fabulous Kisses", "You & I"]}, "lucidbeatz": {"hours": 4.6, "plays": 151, "top_tracks": ["Let U Go", "die", "die (sped up)", "Gone", "die (slowed + reverb)"]}, "Roxy Music": {"hours": 1.5, "plays": 24, "top_tracks": ["More Than This", "Avalon"]}, "Thundercat": {"hours": 1.3, "plays": 27, "top_tracks": ["Show You The Way", "Them Changes", "Funny Thing"]}, "The Human League": {"hours": 1.5, "plays": 27, "top_tracks": ["(Keep Feeling) Fascination - Remastered", "Don't You Want Me"]}, "Mr. Mister": {"hours": 1.5, "plays": 16, "top_tracks": ["Broken Wings"]}, "New Order": {"hours": 1.3, "plays": 16, "top_tracks": ["Blue Monday", "Blue Monday '88", "Bizarre Love Triangle - 2024 Digital Master", "True Faith", "The Perfect Kiss - 2015 Remaster"]}, "Queens of the Stone Age": {"hours": 1.2, "plays": 22, "top_tracks": ["Go With The Flow", "First It Giveth", "No One Knows", "The Lost Art Of Keeping A Secret", "Little Sister"]}, "The Be Good Tanyas": {"hours": 1.0, "plays": 12, "top_tracks": ["Waiting Around To Die"]}, "Jazzy Coffee": {"hours": 3.3, "plays": 35, "top_tracks": ["Standing in This Dream", "Endless Stars", "Perfect Night", "Deep Passion", "Catchy Jazz"]}, "Green Day": {"hours": 1.9, "plays": 38, "top_tracks": ["Brain Stew", "Boulevard of Broken Dreams", "Basket Case", "Welcome to Paradise", "When I Come Around"]}, "KISS": {"hours": 2.0, "plays": 36, "top_tracks": ["I Was Made For Lovin' You", "Detroit Rock City", "Rock And Roll All Nite", "Every Time I Look At You - Live", "Rock And Roll All Nite - Live/1992"]}, "Chicago": {"hours": 1.1, "plays": 16, "top_tracks": ["If You Leave Me Now", "Street Player - 2003 Remaster"]}, "Good Kid": {"hours": 3.7, "plays": 89, "top_tracks": ["Osmosis", "From the Start", "Bubbly", "Alchemist", "Nomu"]}, "фрози": {"hours": 5.1, "plays": 174, "top_tracks": ["ASTROBOY", "supїdo", "TENSHI", "bounce (i just wanna dance)", "luv <3"]}, "The Black Keys": {"hours": 1.3, "plays": 23, "top_tracks": ["10 Lovers", "Fever", "Turn Blue", "Lonely Boy - 2021 Remaster", "Wild Child"]}, "Hard-Fi": {"hours": 1.0, "plays": 18, "top_tracks": ["Looking For Fun", "They Ain't Your Friends"]}, "Iron Maiden": {"hours": 1.4, "plays": 17, "top_tracks": ["2 Minutes to Midnight - 2015 Remaster", "The Trooper - 2015 Remaster", "The Evil That Men Do - 2015 Remaster", "Aces High - 2015 Remaster", "Wrathchild - 2015 Remaster"]}, "Deep Purple": {"hours": 1.5, "plays": 17, "top_tracks": ["Highway Star - Remastered 2012", "Smoke On The Water - Remastered 2012", "Smoke On The Water - Live In Osaka, Japan / 15th August 1972 / 2014 Remaster", "Knocking At Your Back Door", "Burn - Remastered 2004"]}, "Katya Lel": {"hours": 5.2, "plays": 103, "top_tracks": ["Мой мармеладный (Speed Up)", "Мой мармеладный (Я не права)", "My Marmalade (TikTok Version)"]}, "Airbourne": {"hours": 1.6, "plays": 27, "top_tracks": ["Runnin' Wild", "Bottom of the Well", "Too Much, Too Young, Too Fast", "Breakin' Outta Hell", "Back In the Game"]}, "Ken Carson": {"hours": 4.6, "plays": 126, "top_tracks": ["Fighting My Demons", "Yale", "Freestyle 2", "Jennifer’s Body", "mewtwo"]}, "50 Cent": {"hours": 2.9, "plays": 54, "top_tracks": ["In Da Club", "P.I.M.P.", "Window Shopper", "Candy Shop", "New Day"]}, "Ace of Base": {"hours": 4.4, "plays": 81, "top_tracks": ["Happy Nation - Radio Edit", "Happy Nation", "All That She Wants"]}, "Bone Thugs-N-Harmony": {"hours": 4.5, "plays": 62, "top_tracks": ["1st of Tha Month", "Thuggish Ruggish Bone", "Foe Tha Love of $"]}, "Latimore": {"hours": 1.0, "plays": 20, "top_tracks": ["Let Me Go", "Long Distance Love"]}, "Peggy Gou": {"hours": 2.7, "plays": 46, "top_tracks": ["(It Goes Like) Nanana - Edit", "It Makes You Forget (Itgehane)", "Starry Night - Edit"]}, "Almendra": {"hours": 1.9, "plays": 40, "top_tracks": ["A Estos Hombres Tristes", "Que el Viento Borró Tus Manos", "Muchacha (Ojos de Papel)", "Ana No Duerme", "Amidama"]}, "Michael Franks": {"hours": 0.9, "plays": 13, "top_tracks": ["Nightmoves", "St. Elmo's Fire", "One Bad Habit", "When I Give My Love to You (with Brenda Russell)"]}, "Ado": {"hours": 3.6, "plays": 62, "top_tracks": ["Aishite Aishite Aishite", "Backlight", "MIRROR", "Value", "RuLe"]}, "Midge Ure": {"hours": 3.0, "plays": 38, "top_tracks": ["The Man Who Sold the World - 2010 Remaster"]}, "Jere Klein": {"hours": 3.9, "plays": 88, "top_tracks": ["ANDO", "CHIKA MALA", "Ram", "TODO KE VER", "2x1"]}, "Gerry Rafferty": {"hours": 1.0, "plays": 13, "top_tracks": ["Baker Street", "Right Down the Line", "Slow Down", "Get It Right Next Time"]}, "Elvis Crespo": {"hours": 1.2, "plays": 18, "top_tracks": ["Suavemente", "Tu Sonrisa", "Luna Llena"]}, "Jungle": {"hours": 0.8, "plays": 16, "top_tracks": ["Talk About It", "Sunshine", "Beat 54 (All Good Now)", "Keep Moving", "Casio"]}, "El Cuarteto De Nos": {"hours": 2.7, "plays": 54, "top_tracks": ["Enamorado tuyo", "Lo malo de ser bueno", "Yendo a la Casa de Damián", "El hijo de Hernández", "No llora"]}, "The Outfield": {"hours": 1.4, "plays": 25, "top_tracks": ["Your Love", "All the Love in the World"]}};
+
+const groups = {"rock-nacional": ["Soda Stereo", "Gustavo Cerati", "Patricio Rey y sus Redonditos de Ricota", "Indio Solari", "Andrés Calamaro", "Virus", "Babasonicos", "Los Enanitos Verdes", "Viejas Locas", "Charly García", "Fito Paez", "Los Piojos", "Los Fabulosos Cadillacs", "Intoxicados", "Pescado Rabioso", "Los Auténticos Decadentes", "Rata Blanca", "Callejeros", "Los Rodriguez", "Bajofondo", "Bersuit Vergarabat", "Luis Alberto Spinetta", "Divididos", "Spinetta Y Los Socios Del Desierto", "Los Prisioneros", "No Te Va Gustar", "La Renga", "Los Abuelos De La Nada", "El Cuarteto De Nos", "Tan Bionica", "Las Pastillas del Abuelo", "Ciro y los Persas", "Memphis La Blusera", "Almendra"], "urbano-under": ["YSY A", "Zuhk", "Rayder", "Henezy", "MECHAYRXMEO", "Dazegxd", "Mikeanyway", "Pa2k", "Biowaverave", "UNIVERSE", "mikeeysmind", "COSMIC KID", "Jósean Log", "Is Dead", "Rmarck", "Hotel Ugly", "Oney1", "Bardero$", "venny", "Zeballos", "Davus", "Kidd Voodoo", "hako", "Adrian", "sho", "DZY", "PXRKX", "C4STL3", "soffyy", "Young Dune", "Milo j", "Bread Beatz"], "reggaeton": ["Bad Bunny", "Milo j", "Wisin & Yandel", "Don Omar", "Eslabon Armado", "El Alfa", "Plan B", "Feid", "Cris Mj", "Cris MJ", "Trueno", "Daddy Yankee", "Tainy", "Maluma", "Rauw Alejandro", "Myke Towers", "Tony Dize", "Duki", "J Balvin", "Angel Y Khriz", "Tego Calderón", "Héctor \"El Father\""], "hiphop": ["The Weeknd", "Travis Scott", "Kendrick Lamar", "Ice Cube", "2Pac", "Eminem", "Don Toliver", "21 Savage", "Drake", "Playboi Carti", "Metro Boomin", "The Notorious B.I.G.", "Dr. Dre", "Kanye West", "Yeat", "Mac Miller", "Bone Thugs-N-Harmony", "Lil Tecca", "Future", "N.W.A.", "Ken Carson", "Tyler, The Creator", "A$AP Rocky", "Brent Faiyaz", "Steve Lacy", "Childish Gambino", "50 Cent", "Grandmaster Flash & The Furious Five", "Ja Rule"], "soul-funk": ["Sade", "Jamiroquai", "Thee Sacred Souls", "Michael Jackson", "Daryl Hall & John Oates", "TOTO", "Makoto Matsushita", "Anri", "Bobby Caldwell", "America", "Marcos Valle", "Earth, Wind & Fire", "Kool & The Gang", "Simply Red", "Philip Bailey", "Steely Dan", "Modjo", "Chris Isaak", "George Benson", "Delegation", "Luther Vandross", "Rick James", "Michael McDonald", "CHIC", "Patrice Rushen", "Grover Washington, Jr.", "Bee Gees", "Marvin Gaye", "BADBADNOTGOOD", "Durand Jones & The Indications", "Jalen Ngonda", "The Charities", "Monophonics", "Frank Sinatra", "Thundercat", "Bell Biv DeVoe", "The Pointer Sisters", "Latimore", "Michael Franks", "Adele", "Lenny Kravitz", "Bruno Mars"], "new-wave": ["Billy Idol", "The Smiths", "The Cure", "A Flock Of Seagulls", "Duran Duran", "Tears For Fears", "Naked Eyes", "Spandau Ballet", "INXS", "Laura Branigan", "The Psychedelic Furs", "Cutting Crew", "Player", "Foreigner", "Journey", "Ace of Base", "Wham!", "Talk Talk", "White Lies", "Pet Shop Boys", "Blondie", "David Bowie", "The Human League", "Mr. Mister", "New Order", "Wang Chung", "Midge Ure", "The Police", "Daft Punk", "Phil Collins", "Paul McCartney"], "indie-alt": ["Arctic Monkeys", "Mac DeMarco", "Tame Impala", "The Strokes", "Radiohead", "Vacations", "TV Girl", "Franz Ferdinand", "Men I Trust", "Gorillaz", "The Verve", "Tempesst", "Blur", "R.E.M.", "Los Bunkers", "Zoé", "Airbag", "León Larregui", "Basement", "Good Kid", "Steve Lacy", "Dominic Fike", "Malcolm Todd", "Muse", "Jungle", "Inhaler", "Laufey", "Everything But The Girl", "The Black Keys"], "metal": ["Metallica", "AC/DC", "Deftones", "System Of A Down", "TOOL", "Black Sabbath", "Alice In Chains", "Three Days Grace", "Linkin Park", "Limp Bizkit", "Nirvana", "Stone Temple Pilots", "Guns N' Roses", "Megadeth", "Soundgarden", "Red Hot Chili Peppers", "Rata Blanca", "Pantera", "Iron Maiden", "Danzig", "Pearl Jam", "Audioslave", "Foo Fighters", "Queens of the Stone Age", "Green Day", "Deep Purple", "Whitesnake", "KISS", "Airbourne", "Scorpions", "Bon Jovi", "Superheaven", "Whirr", "Nothing", "Bleed", "Buckethead"], "tropical": ["Grupo Niche", "Eddie Santiago", "Willie Colón", "Frankie Ruiz", "Adalberto Santiago", "Romeo Santos", "Aventura", "Los Cafres", "Los Pericos", "El Gran Combo De Puerto Rico", "Héctor Lavoe", "La Vela Puerca", "Elvis Crespo"], "yacht-citypop": ["平田志穂子", "梶浦 由記", "アトラスサウンドチーム", "Azumi Takahashi", "Tomoko Aran", "Mariya Takeuchi", "Lisa Ono", "Lotus Juice", "Kingo Hamada", "Masayoshi Takanaka", "Jeremy Soule", "C418", "Ado", "piri", "binki", "suei"], "classic-rock": ["Led Zeppelin", "Pink Floyd", "The Beatles", "The Rolling Stones", "Eagles", "Fleetwood Mac", "Yes", "Electric Light Orchestra", "Dire Straits", "Rod Stewart", "10cc", "Chicago", "The Doobie Brothers", "REO Speedwagon", "Ambrosia", "Lynyrd Skynyrd", "Roxy Music", "The Alan Parsons Project", "Christopher Cross", "Chris Rainbow", "Bryan Adams", "Live", "Gerry Rafferty", "Queen", "The Jeremy Spencer Band", "The Be Good Tanyas", "Hard-Fi"], "latino-alt": ["Kevin Kaarl", "Mon Laferte", "El Soldado", "Jarabe De Palo", "Mike Lamadrid", "Zoé", "Miranda!", "Los Prisioneros", "Los Auténticos Decadentes", "Ciro y los Persas", "Adolescent's Orquesta", "C.R.O", "Julius Popper", "Viuta", "Mugshot", "benyi"], "mixtape-under": ["Lyn", "54 Ultra", "Tory Lanez", "Meldrop", "Jordan Lee", "LNRT", "Rad&Co", "berlioz", "Common Saints", "Stardust", "NBSPLV", "Pale Jay", "Club Kuru", "Aaron May", "Orange Dog Club", "Velvet Lune", "Mezz", "Fazzini", "Zion", "Organic Audio", "Man Man", "Dabeull", "lucidbeatz", "Jazzy Coffee", "фрози", "Peggy Gou", "Jere Klein", "The Outfield", "Katya Lel", "Carla White"]};
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+for (const [gridId, artists] of Object.entries(groups)){
+  const el = document.getElementById('grid-' + gridId);
+  if(!el) continue;
+  let html = '';
+  for(const name of artists){
+    const info = data[name];
+    if(!info) continue;
+    const tracks = info.top_tracks.slice(0,3).join(' · ');
+    html += `<div class="artist-card">
+      <p class="name">${esc(name)}</p>
+      <p class="hours">${info.hours}h escuchadas</p>
+      <p class="tracks">${esc(tracks)}</p>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+// Tabs
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabPanels = {
+  analisis: document.getElementById('tab-analisis'),
+  playlists: document.getElementById('tab-playlists')
+};
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    Object.values(tabPanels).forEach(p => p.classList.remove('active'));
+    tabPanels[btn.dataset.tab].classList.add('active');
+  });
+});
+
+// Playlist list (en el orden que las tenés en tu biblioteca)
+const playlists = [
+  {name: "90s fr", id: "5BicTHp4zd3sDpM5hhuFIB"},
+  {name: "Rocksito", id: "0NOxCpbGq9Nlf2wIlpx2mw"}, 
+  {name: "Argentinian Rock", id: "0vmlAsDEq6A8u27fqB2eZw"},
+  {name: "Culmen Aureum", id: "6NP742fxMHWLb1EVRZPP9e"},
+  {name: "City Pop", id: "5a0ovqxT5lvq0CZQgeGRU4"},
+  {name: "Trap (Ingles)", id: "1AwonjOzTT97OZsUx7GASN"},
+  {name: "That Feeling (tipo romanticon)", id: "2lmhM8GdPVdi5p35F1E7lf"},
+  {name: "Soft Rock 80s", id: "28b8U8yhaIfvUIMsSKwaJu"},
+  {name: "Rocksito Vol. II", id: "5EcXVos08eDzztU84NYToM"},
+  {name: "Biblioteca", id: "26BqG85lW3lokkcnoasssQ"},
+  {name: "The gdamn mix (groove/jazz type of songs)", id: "68TaABlnvA3pSJgq9mGuaN"},
+];
+const plEl = document.getElementById('playlist-embeds');
+let plHtml = '';
+for (const pl of playlists){
+  if (pl.id){
+    plHtml += `<div class="embed-card">
+      <p class="pname">${esc(pl.name)}</p>
+      <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/${pl.id}?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>`;
+  } else {
+    plHtml += `<div class="embed-card">
+      <p class="pname">${esc(pl.name)}</p>
+      <p class="tracks" style="margin:0;">Falta el link para embeber esta — buscala en tu biblioteca de Spotify.</p>
+    </div>`;
+  }
+}
+plEl.innerHTML = plHtml;
+</script>
+</body>
+</html>
